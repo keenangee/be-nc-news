@@ -6,12 +6,16 @@ const {
   psql400Error,
 } = require("./controllers/errorHandle.controller");
 const { getTopics } = require("./controllers/topics.controller");
-const { getArticleById } = require("./controllers/articles.controller");
+const {
+  getArticleById,
+  getArticle,
+} = require("./controllers/articles.controller");
 
 const app = express();
 
 app.get("/api/topics", getTopics);
 
+app.get("/api/articles", getArticle);
 app.get("/api/articles/:article_id", getArticleById);
 
 app.all("/*", RouteNotFoundError);
