@@ -2,22 +2,22 @@ const express = require("express");
 const {
   RouteNotFoundError,
   serverError500,
+  customErrors,
+  psql400Error,
 } = require("./controllers/errorHandle.controller");
 const { getTopics } = require("./controllers/topics.controller");
+const { getArticleById } = require("./controllers/articles.controller");
 
 const app = express();
 
-app.get("/api", (req, res, next) => {
-  res.status(200).send({ msg: "Server is up and running" }).catch(next);
-});
-
 app.get("/api/topics", getTopics);
 
-app.all("/*", (req, res, next) => {
-  next({ status: 404, msg: "Route not found" });
-});
+app.get("/api/articles/:article_id", getArticleById);
 
-app.use(RouteNotFoundError);
+app.all("/*", RouteNotFoundError);
+
+app.use(psql400Error);
+app.use(customErrors);
 app.use(serverError500);
 
 module.exports = app;
