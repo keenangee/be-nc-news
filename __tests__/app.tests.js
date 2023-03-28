@@ -112,4 +112,72 @@ describe("nc news app", () => {
         });
     });
   });
+  describe("GET /api/articles", () => {
+    test('status: 200, responds with an object containing a key of "articles" and a value of an array of objects', () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Object.keys(body)[0]).toBe("articles");
+          expect(body.articles).toBeInstanceOf(Array);
+          expect(body.articles[0]).toBeInstanceOf(Object);
+        });
+    });
+    test("status: 200, responds with an array of article objects with the correct keys", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toHaveLength(12);
+          body.articles.forEach((article) => {
+            expect(article).toMatchObject({
+              article_id: expect.any(Number),
+              author: expect.any(String),
+              title: expect.any(String),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            });
+          });
+        });
+    });
+    test("status: 200, responds with the correct comment count for article", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          const article9 = body.articles.find(
+            (article) => article.article_id === 9
+          );
+          const article6 = body.articles.find(
+            (article) => article.article_id === 6
+          );
+
+          expect(article9.comment_count).toBe(2);
+          expect(article6.comment_count).toBe(1);
+        });
+    });
+    test("status: 200, responds with an array of article objects sorted by 'created_at' in descending order", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles).toBeSortedBy("created_at", {
+            descending: true,
+          });
+        });
+    });
+    test("status: 404, responds with an error message if end point is not correct (typo in url)", () => {
+      return request(app)
+        .get("/api/articles-typo")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Route not found",
+          });
+        });
+    });
+  });
 });
