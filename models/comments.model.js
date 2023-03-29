@@ -20,8 +20,8 @@ exports.insertCommentByArticleId = (article_id, username, body) => {
   return db
     .query(
       `
-          INSERT INTO comments (author, article_id, body, created_at)
-          VALUES ($1, $2, $3, NOW())
+          INSERT INTO comments (author, article_id, body)
+          VALUES ($1, $2, $3)
           RETURNING *;
               `,
       [username, article_id, body]
