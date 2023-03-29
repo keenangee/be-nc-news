@@ -107,7 +107,7 @@ describe("nc news app", () => {
         .expect(400)
         .then(({ body }) => {
           expect(body).toEqual({
-            msg: "Oops... Bad Request",
+            msg: "Bad Request",
           });
         });
     });
@@ -251,7 +251,107 @@ describe("nc news app", () => {
         .expect(400)
         .then(({ body }) => {
           expect(body).toEqual({
-            msg: "Oops... Bad Request",
+            msg: "Bad Request",
+          });
+        });
+    });
+  });
+  describe("POST /api/articles/:article_id/comments", () => {
+    test('status: 201, responds with an object containing a key of "comment" and a value of an object', () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "butter_bridge", body: "Test comment" })
+        .expect(201)
+        .then(({ body }) => {
+          expect(Object.keys(body)[0]).toBe("comment");
+          expect(body.comment).toBeInstanceOf(Object);
+        });
+    });
+    test("status: 201, responds with an object with the correct keys and values types", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "butter_bridge", body: "Test comment" })
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.comment).toMatchObject({
+            comment_id: expect.any(Number),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+          });
+        });
+    });
+    test("status: 201, responds with an object with the correct keys and specific values for the sent comment", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "butter_bridge", body: "Test comment" })
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.comment).toMatchObject({
+            comment_id: 19,
+            author: "butter_bridge",
+            body: "Test comment",
+            article_id: 1,
+            votes: 0,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    //error handling
+    test("status: 400, responds with an error message if the article id is not a number", () => {
+      return request(app)
+        .post("/api/articles/not-a-number/comments")
+        .send({ username: "butter_bridge", body: "Test comment" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Bad Request",
+          });
+        });
+    });
+    test("status: 404, responds with an error message if the article id is not found, but is a valid number", () => {
+      return request(app)
+        .post("/api/articles/999/comments")
+        .send({ username: "butter_bridge", body: "Test comment" })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "article_id not found",
+          });
+        });
+    });
+    test("status: 404, responds with an error message if the username is not found", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "not-a-username", body: "Test comment" })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "author not found",
+          });
+        });
+    });
+    test("status: 400, responds with an error message if the body is missing", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ username: "butter_bridge" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Bad Request",
+          });
+        });
+    });
+    test("status: 400, responds with an error message if the username is missing", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({ body: "Test comment" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Bad Request",
           });
         });
     });
