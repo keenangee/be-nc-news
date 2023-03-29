@@ -486,4 +486,41 @@ describe("nc news app", () => {
         });
     });
   });
+  describe("GET /api/users", () => {
+    test("status: 200, responds with an object containing a key of 'users' and a value of an array of objects", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Object.keys(body)[0]).toBe("users");
+          expect(body.users).toBeInstanceOf(Array);
+          expect(body.users[0]).toBeInstanceOf(Object);
+        });
+    });
+    test("status: 200, responds with an array of objects with the correct keys and values types", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.users).toHaveLength(4);
+          body.users.forEach((user) => {
+            expect(user).toMatchObject({
+              username: expect.any(String),
+              avatar_url: expect.any(String),
+              name: expect.any(String),
+            });
+          });
+        });
+    });
+    test("status: 404, responds with an error message if end point is not correct (typo in url)", () => {
+      return request(app)
+        .get("/api/users-typo")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Route not found",
+          });
+        });
+    });
+  });
 });
