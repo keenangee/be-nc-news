@@ -299,7 +299,6 @@ describe("nc news app", () => {
           });
         });
     });
-    //error handling
     test("status: 400, responds with an error message if the article id is not a number", () => {
       return request(app)
         .post("/api/articles/not-a-number/comments")
@@ -348,6 +347,107 @@ describe("nc news app", () => {
       return request(app)
         .post("/api/articles/1/comments")
         .send({ body: "Test comment" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Bad Request",
+          });
+        });
+    });
+  });
+  describe("PATCH /api/articles/:article_id", () => {
+    test("status: 200, responds with an object containing a key of 'article' and a value of an object", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(Object.keys(body)[0]).toBe("article");
+          expect(body.article).toBeInstanceOf(Object);
+        });
+    });
+    test("status: 200, responds with an object with the correct keys and values types", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            body: expect.any(String),
+            votes: expect.any(Number),
+            topic: expect.any(String),
+          });
+        });
+    });
+    test("status: 200, responds with an object with the correct keys and specific values with the vote count increased", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 3 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article).toMatchObject({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            body: "I find this existence challenging",
+            votes: 103,
+            topic: "mitch",
+          });
+        });
+    });
+    test("status: 200, responds with an object with the correct keys and specific values with the vote count decreased", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: -50 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article).toMatchObject({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            body: "I find this existence challenging",
+            votes: 50,
+            topic: "mitch",
+          });
+        });
+    });
+    test("status: 400, responds with an error message if the article id is not a number", () => {
+      return request(app)
+        .patch("/api/articles/not-a-number")
+        .send({ inc_votes: 1 })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Bad Request",
+          });
+        });
+    });
+    test("status: 404, responds with an error message if the article id is not found, but is a valid number", () => {
+      return request(app)
+        .patch("/api/articles/999")
+        .send({ inc_votes: 1 })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Article not found",
+          });
+        });
+    });
+    test("status: 400, responds with an error message if the inc_votes is not a number", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: "not-a-number" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Bad Request",
+          });
+        });
+    });
+    test("status: 400, responds with an error message if the inc_votes is missing", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({})
         .expect(400)
         .then(({ body }) => {
           expect(body).toEqual({
