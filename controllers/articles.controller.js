@@ -3,11 +3,33 @@ const {
   fetchArticle,
   updateArticleById,
 } = require("../models/articles.model");
+const { checkAllArticleTopics, checkColumnExists } = require("../utils/utils");
 
 exports.getArticle = (req, res, next) => {
-  fetchArticle()
-    .then((articles) => {
-      res.status(200).send({ articles });
+  const { sort_by, order, topic } = req.query;
+
+  const promiseArray = [];
+
+  if (sort_by) {
+    promiseArray.push(checkColumnExists("articles", sort_by));
+  }
+
+  if (topic) {
+    promiseArray.push(checkAllArticleTopics(topic));
+  }
+
+  Promise.all(promiseArray)
+    .then((result) => {
+      if (result.includes(false)) {
+        return Promise.reject({ status: 400, msg: "Invalid sort query" });
+      }
+    })
+    .then(() => {
+      fetchArticle(sort_by, order, topic)
+        .then((articles) => {
+          res.status(200).send({ articles });
+        })
+        .catch((err) => next(err));
     })
     .catch((err) => next(err));
 };
