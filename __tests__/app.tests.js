@@ -456,4 +456,34 @@ describe("nc news app", () => {
         });
     });
   });
+  describe("DELETE /api/comments/:comment_id", () => {
+    test("status: 204, responds with no content", () => {
+      return request(app)
+        .delete("/api/comments/1")
+        .expect(204)
+        .then(({ body }) => {
+          expect(body).toEqual({});
+        });
+    });
+    test("status: 400, responds with an error message if the comment id is not a number", () => {
+      return request(app)
+        .delete("/api/comments/not-a-number")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Bad Request",
+          });
+        });
+    });
+    test("status: 404, responds with an error message if the comment id is not found, but is a valid number", () => {
+      return request(app)
+        .delete("/api/comments/999")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Comment not found",
+          });
+        });
+    });
+  });
 });

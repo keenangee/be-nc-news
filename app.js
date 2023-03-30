@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-  RouteNotFoundError,
+  routeNotFoundError,
   serverError500,
   customErrors,
   psql400Error,
@@ -15,6 +15,7 @@ const {
 const {
   getCommentsByArticleId,
   postCommentByArticleId,
+  deleteCommentById,
 } = require("./controllers/comments.controller");
 
 const app = express();
@@ -31,7 +32,9 @@ app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.post("/api/articles/:article_id/comments", postCommentByArticleId);
 
-app.all("/*", RouteNotFoundError);
+app.delete("/api/comments/:comment_id", deleteCommentById);
+
+app.all("/*", routeNotFoundError);
 
 app.use(customErrors);
 app.use(psql400Error);
