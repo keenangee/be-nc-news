@@ -523,4 +523,194 @@ describe("nc news app", () => {
         });
     });
   });
+  describe("GET  /api/articles QUERIES", () => {
+    describe("GET /api/articles?topic=", () => {
+      test("status: 200, responds with an object containing a key of 'articles' and a value of an array of objects", () => {
+        return request(app)
+          .get("/api/articles?topic=mitch")
+          .expect(200)
+          .then(({ body }) => {
+            expect(Object.keys(body)[0]).toBe("articles");
+            expect(body.articles).toBeInstanceOf(Array);
+            expect(body.articles[0]).toBeInstanceOf(Object);
+          });
+      });
+      test("status: 200, responds with an array of objects with the correct keys and values types", () => {
+        return request(app)
+          .get("/api/articles?topic=cats")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toHaveLength(1);
+            body.articles.forEach((article) => {
+              expect(article).toMatchObject({
+                article_id: expect.any(Number),
+                author: expect.any(String),
+                title: expect.any(String),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(Number),
+              });
+            });
+          });
+      });
+      test("status: 400, responds with an error message if the topic is not found (typo or invalid query)", () => {
+        return request(app)
+          .get("/api/articles?topic=not-a-topic")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).toEqual({
+              msg: "Invalid sort query",
+            });
+          });
+      });
+    });
+    describe("GET /api/articles?sort_by=", () => {
+      test("status: 200, responds with an object containing a key of 'articles' and a value of an array of objects", () => {
+        return request(app)
+          .get("/api/articles?sort_by=author")
+          .expect(200)
+          .then(({ body }) => {
+            expect(Object.keys(body)[0]).toBe("articles");
+            expect(body.articles).toBeInstanceOf(Array);
+            expect(body.articles[0]).toBeInstanceOf(Object);
+          });
+      });
+      test("status: 200, responds with an array of objects with the correct keys and values types", () => {
+        return request(app)
+          .get("/api/articles?sort_by=author")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toHaveLength(12);
+            body.articles.forEach((article) => {
+              expect(article).toMatchObject({
+                article_id: expect.any(Number),
+                author: expect.any(String),
+                title: expect.any(String),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(Number),
+              });
+            });
+          });
+      });
+      test("status: 200, responds with an array that is sorted correctly depending on the sort query - AUTHOR", () => {
+        return request(app)
+          .get("/api/articles?sort_by=author")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toBeSortedBy("author", {
+              descending: false,
+            });
+          });
+      });
+      test("status: 200, responds with an array that is sorted correctly depending on the sort query - TITLE", () => {
+        return request(app)
+          .get("/api/articles?sort_by=title")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toBeSortedBy("title", {
+              descending: false,
+            });
+          });
+      });
+      test("status: 400, responds with an error message if the column to be sorted is not found (typo or invalid query)", () => {
+        return request(app)
+          .get("/api/articles?sort_by=not-a-column")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).toEqual({
+              msg: "Invalid sort query",
+            });
+          });
+      });
+    });
+    describe("GET /api/articles?order=", () => {
+      test("status: 200, responds with an object containing a key of 'articles' and a value of an array of objects", () => {
+        return request(app)
+          .get("/api/articles?sort_by=author&&order=asc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(Object.keys(body)[0]).toBe("articles");
+            expect(body.articles).toBeInstanceOf(Array);
+            expect(body.articles[0]).toBeInstanceOf(Object);
+          });
+      });
+      test("status: 200, responds with an array of objects with the correct keys and values types", () => {
+        return request(app)
+          .get("/api/articles?sort_by=author&&order=asc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toHaveLength(12);
+            body.articles.forEach((article) => {
+              expect(article).toMatchObject({
+                article_id: expect.any(Number),
+                author: expect.any(String),
+                title: expect.any(String),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(Number),
+              });
+            });
+          });
+      });
+      test("status: 200, responds with an array that is sorted by author and ordered correctly ASC", () => {
+        return request(app)
+          .get("/api/articles?sort_by=author&&order=asc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toBeSortedBy("author", {
+              descending: false,
+            });
+          });
+      });
+      test("status: 200, responds with an array that is sorted by author and ordered correctly DESC", () => {
+        return request(app)
+          .get("/api/articles?sort_by=title&&order=desc")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toBeSortedBy("title", {
+              descending: true,
+            });
+          });
+      });
+      test("status: 400, responds with an error message if the order by is anything other than 'asc' or 'desc'", () => {
+        return request(app)
+          .get("/api/articles?sort_by=title&&order=sideways")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).toEqual({
+              msg: "Invalid order query",
+            });
+          });
+      });
+    });
+    describe("GET /api/articles query sql injection", () => {
+      test("status: 400, responds with an error if the queries are anything other than the allowed words", () => {
+        return request(app)
+          .get("/api/articles?sort_by=author; DROP TABLE articles;")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).toEqual({
+              msg: "Invalid sort query",
+            });
+          });
+      });
+      test("status: 400, responds with an error if the queries are anything other than the allowed words", () => {
+        return request(app)
+          .get("/api/articles?topic=mitch; DROP TABLE articles;")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body).toEqual({
+              msg: "Invalid sort query",
+            });
+          });
+      });
+    });
+  });
 });
