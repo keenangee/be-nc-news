@@ -41,9 +41,12 @@ exports.fetchArticleById = (article_id) => {
   return db
     .query(
       `
-    SELECT *
+    SELECT articles.*, CAST(count(comments.comment_id)AS INTEGER) AS comment_count
     FROM articles
+    LEFT JOIN comments
+    ON articles.article_id = comments.article_id
     WHERE articles.article_id = $1
+    GROUP BY articles.article_id
         `,
       [article_id]
     )
