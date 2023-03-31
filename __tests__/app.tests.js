@@ -765,4 +765,33 @@ describe("nc news app", () => {
         });
     });
   });
+  describe("GET /api", () => {
+    test("status: 200, responds with a JSON file", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Object.keys(body)[0]).toBe("endpoints");
+        });
+    });
+    test("status: 200, the 'endpoint' will have a value of an array of objects", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.endpoints).toBeInstanceOf(Array);
+          expect(body.endpoints[0]).toBeInstanceOf(Object);
+        });
+    });
+    test("status 404, responds with an error message if there is a typo in path", () => {
+      return request(app)
+        .get("/api-typo")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Route not found",
+          });
+        });
+    });
+  });
 });

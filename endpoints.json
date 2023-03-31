@@ -1,27 +1,131 @@
 {
-  "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api"
-  },
-  "GET /api/topics": {
-    "description": "serves an array of all topics",
-    "queries": [],
-    "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
-    }
-  },
-  "GET /api/articles": {
-    "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
-    "exampleResponse": {
-      "articles": [
-        {
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": 1527695953341
+  "endpoints": [
+    {
+      "GET /api": {
+        "description": "serves up a json representation of all the available endpoints of the api"
+      },
+      "GET /api/users": {
+        "description": "serves an array of all users",
+        "queries": [],
+        "exampleResponse": {
+          "users": [
+            {
+              "username": "tickle122",
+              "name": "Tom Tickle",
+              "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/d/d6/Mr-Tickle-9a.png/revision/latest?cb=20180127221953"
+            }
+          ]
         }
-      ]
+      },
+      "GET /api/topics": {
+        "description": "serves an array of all topics",
+        "queries": [],
+        "exampleResponse": {
+          "topics": [
+            {
+              "slug": "coding",
+              "description": "Code is love, code is life"
+            }
+          ]
+        }
+      },
+      "GET /api/articles": {
+        "description": "serves an array of all articles",
+        "queries": ["topic", "sort_by", "order"],
+        "exampleResponse": {
+          "topics": [
+            {
+              "article_id": 34,
+              "author": "grumpy19",
+              "title": "The Notorious MSG’s Unlikely Formula For Success",
+              "topic": "cooking",
+              "created_at": "2020-11-22T11:13:00.000Z",
+              "votes": 0,
+              "article_img_url": "https://images.pexels.com/photos/2403392/pexels-photo-2403392.jpeg?w=700&h=700",
+              "comment_count": 11
+            }
+          ]
+        }
+      },
+      "GET /api/articles/:article_id": {
+        "description": "serves an array of one article",
+        "queries": [],
+        "exampleResponse": {
+          "topics": [
+            {
+              "article": {
+                "article_id": 4,
+                "title": "Making sense of Redux",
+                "topic": "coding",
+                "author": "jessjelly",
+                "body": "When I first started learning React, I remember reading lots of articles about the different technologies associated with it. In particular, this one article stood out. It mentions how confusing the ecosystem is, and how developers often feel they have to know ALL of the ecosystem before using React. And as someone who’s used React daily for the past 8 months or so, I can definitely say that I’m still barely scratching the surface in terms of understanding how the entire ecosystem works! But my time spent using React has given me some insight into when and why it might be appropriate to use another technology — Redux (a variant of the Flux architecture).",
+                "created_at": "2020-09-11T21:12:00.000Z",
+                "votes": 0,
+                "article_img_url": "https://images.pexels.com/photos/4974912/pexels-photo-4974912.jpeg?w=700&h=700"
+              }
+            }
+          ]
+        }
+      },
+      "PATCH /api/articles/:article_id": {
+        "description": "Updates an articles vote count and responds with an array of the updated article",
+        "queries": [],
+        "exampleResponse": {
+          "topics": [
+            {
+              "article": {
+                "article_id": 4,
+                "title": "Making sense of Redux",
+                "topic": "coding",
+                "author": "jessjelly",
+                "body": "When I first started learning React, I remember reading lots of articles about the different technologies associated with it. In particular, this one article stood out. It mentions how confusing the ecosystem is, and how developers often feel they have to know ALL of the ecosystem before using React. And as someone who’s used React daily for the past 8 months or so, I can definitely say that I’m still barely scratching the surface in terms of understanding how the entire ecosystem works! But my time spent using React has given me some insight into when and why it might be appropriate to use another technology — Redux (a variant of the Flux architecture).",
+                "created_at": "2020-09-11T21:12:00.000Z",
+                "votes": 100,
+                "article_img_url": "https://images.pexels.com/photos/4974912/pexels-photo-4974912.jpeg?w=700&h=700"
+              }
+            }
+          ]
+        }
+      },
+      "GET /api/articles/:article_id/comments": {
+        "description": "serves an array of one comment for a given article id",
+        "queries": [],
+        "exampleResponse": {
+          "topics": [
+            {
+              "comment_id": 146,
+              "body": "Soluta autem fuga non alias. Odit eligendi voluptas reiciendis repudiandae reiciendis doloribus adipisci qui consequuntur. Et dignissimos unde optio. Recusandae aspernatur eius error. Eos autem et iusto sunt fuga ipsam omnis voluptatem rerum.",
+              "article_id": 4,
+              "author": "jessjelly",
+              "votes": 6,
+              "created_at": "2020-10-12T12:23:00.000Z"
+            }
+          ]
+        }
+      },
+      "POST /api/articles/:article_id/comments": {
+        "description": "Creates comment and responds with an array of the new comment",
+        "queries": [],
+        "exampleResponse": {
+          "topics": [
+            {
+              "comment_id": 147,
+              "body": "Soluta autem fuga non alias. Odit eligendi voluptas reiciendis repudiandae reiciendis doloribus adipisci qui consequuntur. Et dignissimos unde optio. Recusandae aspernatur eius error. Eos autem et iusto sunt fuga ipsam omnis voluptatem rerum.",
+              "article_id": 4,
+              "author": "jessjelly",
+              "votes": 0,
+              "created_at": "2020-10-12T12:23:00.000Z"
+            }
+          ]
+        }
+      },
+      "DELETE /api/comments/:comment_id": {
+        "description": "Removes comment and responds with a status code of 204 and an array of an empty object",
+        "queries": [],
+        "exampleResponse": {
+          "topics": [{}]
+        }
+      }
     }
-  }
+  ]
 }
