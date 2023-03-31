@@ -906,4 +906,83 @@ describe("nc news app", () => {
         });
     });
   });
+  describe("POST /api/articles", () => {
+    test("status: 201, responds with an object containing a key of 'article' and a value of an object with the correct keys and values", () => {
+      return request(app)
+        .post("/api/articles")
+        .send({
+          title: "test_article",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "test body",
+          article_img_url: "https://www.test.com",
+        })
+        .expect(201)
+        .then(
+          ({ body }) => (
+            expect(Object.keys(body)[0]).toBe("article"),
+            expect(body.article).toBeInstanceOf(Object),
+            expect(body.article).toMatchObject({
+              article_id: expect.any(Number),
+              title: "test_article",
+              topic: "mitch",
+              author: "butter_bridge",
+              body: "test body",
+              created_at: expect.any(String),
+              votes: 0,
+              article_img_url: "https://www.test.com",
+              comment_count: 0,
+            })
+          )
+        );
+    });
+    test("status: 400, responds with an error message if the request body is not formatted correctly", () => {
+      return request(app)
+        .post("/api/articles")
+        .send({
+          title: "Test Article",
+          topic: "test_topic",
+        })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Bad Request",
+          });
+        });
+    });
+    test("status: 404, responds with an error message if the topic doesn't exist", () => {
+      return request(app)
+        .post("/api/articles")
+        .send({
+          title: "test_article",
+          topic: "not_a_topic",
+          author: "butter_bridge",
+          body: "test body",
+          article_img_url: "https://www.test.com",
+        })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "topic not found",
+          });
+        });
+    });
+    test("status: 404, responds with an error message if the author doesn't exist", () => {
+      return request(app)
+        .post("/api/articles")
+        .send({
+          title: "test_article",
+          topic: "mitch",
+          author: "not_an_author",
+          body: "test body",
+          article_img_url: "https://www.test.com",
+        })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "author not found",
+          });
+        });
+    });
+  });
 });
