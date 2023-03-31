@@ -64,3 +64,19 @@ exports.removeCommentById = (comment_id) => {
       return result.rows[0];
     });
 };
+
+exports.updateCommentById = (comment_id, newVotes = 0) => {
+  return db
+    .query(
+      `
+      UPDATE comments
+      SET votes = votes + $1
+      WHERE comments.comment_id = $2
+      RETURNING *;
+          `,
+      [newVotes, comment_id]
+    )
+    .then((result) => {
+      return result.rows[0];
+    });
+};

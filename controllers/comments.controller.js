@@ -3,6 +3,7 @@ const {
   insertCommentByArticleId,
   removeCommentById,
   fetchCommentByCommentId,
+  updateCommentById,
 } = require("../models/comments.model");
 const { fetchArticleById } = require("../models/articles.model");
 
@@ -35,6 +36,22 @@ exports.deleteCommentById = (req, res, next) => {
     .then(() => {
       removeCommentById(comment_id).then(() => {
         res.status(204).send();
+      });
+    })
+    .catch((err) => next(err));
+};
+
+exports.patchCommentById = (req, res, next) => {
+  const { comment_id } = req.params;
+  const { inc_votes } = req.body;
+  if (typeof inc_votes !== "number") {
+    return next({ status: 400, msg: "Bad Request" });
+  }
+  fetchCommentByCommentId(comment_id)
+    .then((comment) => {
+      const newVotes = comment.votes + inc_votes;
+      updateCommentById(comment_id, newVotes).then((comment) => {
+        res.status(200).send({ comment });
       });
     })
     .catch((err) => next(err));
