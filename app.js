@@ -23,6 +23,10 @@ const app = express();
 
 app.use(express.json());
 
+app.get("/api", (req, res, next) => {
+  res.status(200).json(require("./endpoints.json"));
+});
+
 app.get("/api/users", getUsers);
 
 app.get("/api/topics", getTopics);
