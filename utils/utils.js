@@ -33,3 +33,21 @@ exports.checkColumnExists = (table, column) => {
       return columns.includes(column);
     });
 };
+
+exports.checkLimitandP = (limit, p) => {
+  if (limit && isNaN(limit)) {
+    return Promise.reject({ status: 400, msg: "Invalid limit query" });
+  }
+  if (p && isNaN(p)) {
+    return Promise.reject({ status: 400, msg: "Invalid page query" });
+  }
+
+  return Promise.resolve(true);
+};
+
+exports.calculateStartindexAndEndindex = (limit = 10, p = 1) => {
+  const startIndex = limit * (p - 1);
+  const endIndex = limit * p;
+
+  return { startIndex, endIndex };
+};

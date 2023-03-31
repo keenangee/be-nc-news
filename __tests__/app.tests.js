@@ -128,7 +128,7 @@ describe("nc news app", () => {
         .get("/api/articles")
         .expect(200)
         .then(({ body }) => {
-          expect(body.articles).toHaveLength(12);
+          expect(body.articles).toHaveLength(10);
           body.articles.forEach((article) => {
             expect(article).toMatchObject({
               article_id: expect.any(Number),
@@ -582,7 +582,7 @@ describe("nc news app", () => {
           .get("/api/articles?sort_by=author")
           .expect(200)
           .then(({ body }) => {
-            expect(body.articles).toHaveLength(12);
+            expect(body.articles).toHaveLength(10);
             body.articles.forEach((article) => {
               expect(article).toMatchObject({
                 article_id: expect.any(Number),
@@ -644,7 +644,7 @@ describe("nc news app", () => {
           .get("/api/articles?sort_by=author&&order=asc")
           .expect(200)
           .then(({ body }) => {
-            expect(body.articles).toHaveLength(12);
+            expect(body.articles).toHaveLength(10);
             body.articles.forEach((article) => {
               expect(article).toMatchObject({
                 article_id: expect.any(Number),
@@ -981,6 +981,86 @@ describe("nc news app", () => {
         .then(({ body }) => {
           expect(body).toEqual({
             msg: "author not found",
+          });
+        });
+    });
+  });
+  describe("GET /api/articles (pagination)", () => {
+    test("status: 200, responds with an object containing a key of 'articles' and a value of an array of objects with the length of 10 by default", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Object.keys(body)[0]).toBe("articles");
+          expect(body.articles).toBeInstanceOf(Array);
+          expect(body.articles.length).toBe(10);
+        });
+    });
+    test("status: 200, responds with the correct number of articles when limit is specified", async () => {
+      const res = await request(app).get("/api/articles?limit=5");
+      expect(res.status).toEqual(200);
+      expect(res.body.articles.length).toBe(5);
+    });
+    test("status: 200, responds with the correct page of articles when p is specified", async () => {
+      const res = await request(app).get(
+        "/api/articles?sort_by=article_id&p=2"
+      );
+      expect(res.status).toEqual(200);
+      expect(res.body.articles[0].article_id).toBe(11);
+      expect(res.body.articles[1].article_id).toBe(12);
+    });
+    test("status: 200, responds with the correct number of articles when p and limit are specified", async () => {
+      const res = await request(app).get(
+        "/api/articles?sort_by=article_id&limit=3&p=3"
+      );
+      expect(res.status).toEqual(200);
+      expect(res.body.articles.length).toBe(3);
+      expect(res.body.articles[0].article_id).toBe(7);
+      expect(res.body.articles[1].article_id).toBe(8);
+      expect(res.body.articles[2].article_id).toBe(9);
+    });
+    test("status: 200, responds with the correct total_count when filters are applied", async () => {
+      const res = await request(app).get("/api/articles?topic=mitch");
+      expect(res.status).toEqual(200);
+      expect(res.body.total_count).toBe(11);
+    });
+    test("status: 400, responds with an error message if the limit is an invalid query", async () => {
+      return request(app)
+        .get("/api/articles?limit=not_a_number")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Invalid limit query",
+          });
+        });
+    });
+    test("status: 400, responds with an error message if the p is an invalid query", async () => {
+      return request(app)
+        .get("/api/articles?p=not_a_number")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Invalid page query",
+          });
+        });
+    });
+    test("status: 404, responds with an error message for out of bonds p query", async () => {
+      return request(app)
+        .get("/api/articles?p=100")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Page 100 does not exist",
+          });
+        });
+    });
+    test("status: 404, responds with an error message for out of bonds p query", async () => {
+      return request(app)
+        .get("/api/articles?p=50")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Page 50 does not exist",
           });
         });
     });
