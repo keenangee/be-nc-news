@@ -76,3 +76,18 @@ exports.updateArticleById = (article_id, inc_votes) => {
       return result.rows[0];
     });
 };
+
+exports.insertArticle = (title, topic, author, body, article_img_url) => {
+  return db
+    .query(
+      `
+    INSERT INTO articles (title, topic, author, body, article_img_url)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING *
+    `,
+      [title, topic, author, body, article_img_url]
+    )
+    .then((result) => {
+      return result.rows[0];
+    });
+};
