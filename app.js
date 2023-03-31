@@ -1,4 +1,6 @@
 const express = require("express");
+const apiRouter = require("./routes/api-router");
+
 const {
   routeNotFoundError,
   serverError500,
@@ -6,40 +8,12 @@ const {
   psql400Error,
   psql404Error,
 } = require("./controllers/errorHandle.controller");
-const { getTopics } = require("./controllers/topics.controller");
-const {
-  getArticleById,
-  getArticle,
-  patchArticleById,
-} = require("./controllers/articles.controller");
-const {
-  getCommentsByArticleId,
-  postCommentByArticleId,
-  deleteCommentById,
-} = require("./controllers/comments.controller");
-const { getUsers } = require("./controllers/users.controller");
 
 const app = express();
 
 app.use(express.json());
 
-app.get("/api", (req, res, next) => {
-  res.status(200).json(require("./endpoints.json"));
-});
-
-app.get("/api/users", getUsers);
-
-app.get("/api/topics", getTopics);
-
-app.get("/api/articles", getArticle);
-app.get("/api/articles/:article_id", getArticleById);
-app.patch("/api/articles/:article_id", patchArticleById);
-
-app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
-
-app.post("/api/articles/:article_id/comments", postCommentByArticleId);
-
-app.delete("/api/comments/:comment_id", deleteCommentById);
+app.use("/api", apiRouter);
 
 app.all("/*", routeNotFoundError);
 
