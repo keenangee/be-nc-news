@@ -794,4 +794,31 @@ describe("nc news app", () => {
         });
     });
   });
+  describe("GET /users/:username", () => {
+    test("status: 200, responds with an object containing a key of 'user' and a value of an object with the correct keys and values", () => {
+      return request(app)
+        .get("/api/users/butter_bridge")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Object.keys(body)[0]).toBe("user");
+          expect(body.user).toBeInstanceOf(Object);
+          expect(body.user).toMatchObject({
+            username: "butter_bridge",
+            avatar_url:
+              "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+            name: "jonny",
+          });
+        });
+    });
+    test("status: 404, responds with an error message if the username does not exist", () => {
+      return request(app)
+        .get("/api/users/does_not_exist")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "User not found",
+          });
+        });
+    });
+  });
 });
