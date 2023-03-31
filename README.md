@@ -40,9 +40,7 @@ To run tests, follow these steps:
 
 1. Create a `.env.test` file in your root for the test environment (see `.env-example` for example)
 
-2. You will need to install some dev dependencies to run the tests: `npm install jest -D` and `npm install supertest -D`
-
-3. Run the tests: `npm test`
+2. Run the tests: `npm test`
 
 ## Running the app locally
 
