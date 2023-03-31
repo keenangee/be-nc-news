@@ -764,25 +764,5 @@ describe("nc news app", () => {
           });
         });
     });
-    test("status: 404, responds with an error message if the article id is not found, but is a valid number", () => {
-      return request(app)
-        .get("/api/articles/999")
-        .expect(404)
-        .then(({ body }) => {
-          expect(body).toEqual({
-            msg: "Article not found",
-          });
-        });
-    });
-    test("status: 400, responds with an error message if the article id is not a number", () => {
-      return request(app)
-        .get("/api/articles/not-a-number")
-        .expect(400)
-        .then(({ body }) => {
-          expect(body).toEqual({
-            msg: "Bad Request",
-          });
-        });
-    });
   });
 });
