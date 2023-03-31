@@ -4,10 +4,15 @@ const {
   updateArticleById,
   insertArticle,
 } = require("../models/articles.model");
-const { checkAllArticleTopics, checkColumnExists } = require("../utils/utils");
+const {
+  checkAllArticleTopics,
+  checkColumnExists,
+  checkLimitandP,
+  calculateStartindexAndEndindex,
+} = require("../utils/utils");
 
 exports.getArticle = (req, res, next) => {
-  const { sort_by, order, topic } = req.query;
+  const { sort_by, order, topic, limit, p } = req.query;
 
   const promiseArray = [];
 
@@ -19,6 +24,10 @@ exports.getArticle = (req, res, next) => {
     promiseArray.push(checkAllArticleTopics(topic));
   }
 
+  if (limit || p) {
+    promiseArray.push(checkLimitandP(limit, p));
+  }
+
   Promise.all(promiseArray)
     .then((result) => {
       if (result.includes(false)) {
@@ -26,9 +35,17 @@ exports.getArticle = (req, res, next) => {
       }
     })
     .then(() => {
-      fetchArticle(sort_by, order, topic)
-        .then((articles) => {
-          res.status(200).send({ articles });
+      const { startIndex, endIndex } = calculateStartindexAndEndindex(limit, p);
+      fetchArticle(sort_by, order, topic, limit, startIndex, endIndex)
+        .then(([articles, total_count]) => {
+          if (startIndex > total_count) {
+            return Promise.reject({
+              status: 404,
+              msg: `Page ${p} does not exist`,
+            });
+          }
+
+          res.status(200).send({ articles, total_count });
         })
         .catch((err) => next(err));
     })

@@ -2,7 +2,14 @@ const db = require("../db/connection");
 const { articleNotFoundMsg } = require("../utils/utils");
 const { checkAllArticleTopics, checkColumnExists } = require("../utils/utils");
 
-exports.fetchArticle = (sort_by, order, topic) => {
+exports.fetchArticle = (
+  sort_by,
+  order,
+  topic,
+  limit = 10,
+  startIndex = 0,
+  endIndex = 10
+) => {
   if (order && order !== "asc" && order !== "desc") {
     return Promise.reject({ status: 400, msg: "Invalid order query" });
   }
@@ -33,7 +40,10 @@ exports.fetchArticle = (sort_by, order, topic) => {
     if (result.rowCount === 0) {
       return articleNotFoundMsg();
     }
-    return result.rows;
+
+    const total_count = result.rows.length;
+    const articles = result.rows.slice(startIndex, endIndex);
+    return [articles, total_count];
   });
 };
 
