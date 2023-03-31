@@ -821,4 +821,89 @@ describe("nc news app", () => {
         });
     });
   });
+  describe("PATCH /api/comments/:comment_id", () => {
+    test("status: 200, responds with an object containing a key of 'comment' and a value of an object with the correct keys and values", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({ inc_votes: 10 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(Object.keys(body)[0]).toBe("comment");
+          expect(body.comment).toBeInstanceOf(Object);
+          expect(body.comment).toMatchObject({
+            comment_id: expect.any(Number),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+            author: expect.any(String),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+          });
+        });
+    });
+    test("status: 200, responds with the correct comment details matched with the comment that has the id of 1 and the votes increased", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({ inc_votes: 10 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comment).toMatchObject({
+            comment_id: 1,
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            article_id: 9,
+            author: "butter_bridge",
+            votes: 42,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    test("status: 200, responds with the correct comment details matched with the comment that has the id of 2 and the votes decreased", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({ inc_votes: -10 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comment).toMatchObject({
+            comment_id: 1,
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            article_id: 9,
+            author: "butter_bridge",
+            votes: 22,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    test("status: 400, responds with an error message if the request body is not formatted correctly", () => {
+      return request(app)
+        .patch("/api/comments/1")
+        .send({ inc_votes: "10" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Bad Request",
+          });
+        });
+    });
+    test("status: 404, responds with an error message if the comment_id does not exist", () => {
+      return request(app)
+        .patch("/api/comments/1000")
+        .send({ inc_votes: 10 })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Comment not found",
+          });
+        });
+    });
+    test("status: 400, responds with an error message if the comment_id is not a number", () => {
+      return request(app)
+        .patch("/api/comments/not_a_number")
+        .send({ inc_votes: 10 })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Bad Request",
+          });
+        });
+    });
+  });
 });
