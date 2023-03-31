@@ -713,4 +713,56 @@ describe("nc news app", () => {
       });
     });
   });
+  describe("GET /api/articles/:article_id UPDATE (comment count)", () => {
+    test("status: 200, responds with an object containing a key of 'article' and a value of an object which now also has a 'comment_count' key with the correct value", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {
+          expect(Object.keys(body)[0]).toBe("article");
+          expect(body.article).toBeInstanceOf(Object);
+          expect(body.article).toMatchObject({
+            comment_count: expect.any(Number),
+          });
+        });
+    });
+    test("status: 200, responds with the correct article details matched with the article that has the id of 1 and also now has COMMENT COUNT", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article).toMatchObject({
+            article_id: 1,
+            author: "butter_bridge",
+            title: "Living in the shadow of a great man",
+            body: "I find this existence challenging",
+            topic: "mitch",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 100,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: 11,
+          });
+        });
+    });
+    test("status: 200, responds with the correct article details matched with the article that has the id of 7 and also now has COMMENT COUNT", () => {
+      return request(app)
+        .get("/api/articles/7")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article).toMatchObject({
+            article_id: 7,
+            author: "icellusedkars",
+            title: "Z",
+            body: "I was hungry.",
+            topic: "mitch",
+            created_at: "2020-01-07T14:08:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: 0,
+          });
+        });
+    });
+  });
 });
