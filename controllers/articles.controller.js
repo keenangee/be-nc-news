@@ -3,6 +3,7 @@ const {
   fetchArticle,
   updateArticleById,
   insertArticle,
+  removeArticleById,
 } = require("../models/articles.model");
 const {
   checkAllArticleTopics,
@@ -10,6 +11,7 @@ const {
   checkLimitandP,
   calculateStartindexAndEndindex,
 } = require("../utils/utils");
+const { removeCommentsByArticleId } = require("../models/comments.model");
 
 exports.getArticle = (req, res, next) => {
   const { sort_by, order, topic, limit, p } = req.query;
@@ -80,4 +82,29 @@ exports.postArticle = (req, res, next) => {
       });
     })
     .catch((err) => next(err));
+};
+
+exports.deleteArticleById = (req, res, next) => {
+  const { article_id } = req.params;
+
+  async function deleteArticle() {
+    try {
+      await fetchArticleById(article_id);
+      await removeCommentsByArticleId(article_id);
+      await removeArticleById(article_id);
+      res.sendStatus(204);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  deleteArticle();
+
+  // fetchArticleById(article_id)
+  //   .then(() => {
+  //     removeArticleById(article_id).then(() => {
+  //       res.sendStatus(204);
+  //     });
+  //   })
+  //   .catch((err) => next(err));
 };

@@ -97,7 +97,7 @@ describe("nc news app", () => {
         .expect(404)
         .then(({ body }) => {
           expect(body).toEqual({
-            msg: "Article not found",
+            msg: "Article 999 not found",
           });
         });
     });
@@ -241,7 +241,7 @@ describe("nc news app", () => {
         .expect(404)
         .then(({ body }) => {
           expect(body).toEqual({
-            msg: "Article not found",
+            msg: "Article 999 not found",
           });
         });
     });
@@ -1177,6 +1177,48 @@ describe("nc news app", () => {
       return request(app)
         .post("/api/topics")
         .send({ slug: "test" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Bad Request",
+          });
+        });
+    });
+  });
+  describe("DELETE /api/articles/:article_id", () => {
+    test("status: 204, deletes the article and responds with no content", () => {
+      return request(app)
+        .delete("/api/articles/1")
+        .expect(204)
+        .then(({ body }) => {
+          expect(body).toEqual({});
+        });
+    });
+    test("status: 204, deletes all comments associated with the article", () => {
+      return request(app)
+        .delete("/api/articles/1")
+        .expect(204)
+        .then(() => {
+          return db
+            .query("SELECT * FROM comments WHERE article_id = 1")
+            .then((data) => {
+              expect(data.rows).toEqual([]);
+            });
+        });
+    });
+    test("status: 404, responds with an error message if the article_id does not exist", () => {
+      return request(app)
+        .delete("/api/articles/100")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Article 100 not found",
+          });
+        });
+    });
+    test("status: 400, responds with an error message if the article_id is not a number", () => {
+      return request(app)
+        .delete("/api/articles/not_a_number")
         .expect(400)
         .then(({ body }) => {
           expect(body).toEqual({

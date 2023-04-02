@@ -82,3 +82,18 @@ exports.updateCommentById = (comment_id, newVotes = 0) => {
       return result.rows[0];
     });
 };
+
+exports.removeCommentsByArticleId = (article_id) => {
+  return db
+    .query(
+      `
+      DELETE FROM comments
+      WHERE comments.article_id = $1
+      RETURNING *;
+          `,
+      [article_id]
+    )
+    .then((result) => {
+      return result.rows;
+    });
+};

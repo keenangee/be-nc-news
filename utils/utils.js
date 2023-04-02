@@ -1,7 +1,15 @@
 const db = require("../db/connection");
 
-exports.articleNotFoundMsg = () => {
-  return Promise.reject({ status: 404, msg: "Article not found" });
+exports.articleNotFoundMsg = (article_id) => {
+  if (article_id) {
+    article_id += " ";
+  } else {
+    article_id = "";
+  }
+  return Promise.reject({
+    status: 404,
+    msg: `Article ${article_id}not found`,
+  });
 };
 
 exports.checkAllArticleTopics = (topic) => {

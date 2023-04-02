@@ -62,7 +62,7 @@ exports.fetchArticleById = (article_id) => {
     )
     .then((result) => {
       if (result.rowCount === 0) {
-        return articleNotFoundMsg();
+        return articleNotFoundMsg(article_id);
       }
       return result.rows[0];
     });
@@ -98,6 +98,24 @@ exports.insertArticle = (title, topic, author, body, article_img_url) => {
       [title, topic, author, body, article_img_url]
     )
     .then((result) => {
+      return result.rows[0];
+    });
+};
+
+exports.removeArticleById = (article_id) => {
+  return db
+    .query(
+      `
+    DELETE FROM articles
+    WHERE articles.article_id = $1
+    RETURNING *
+    `,
+      [article_id]
+    )
+    .then((result) => {
+      if (result.rowCount === 0) {
+        return articleNotFoundMsg();
+      }
       return result.rows[0];
     });
 };
