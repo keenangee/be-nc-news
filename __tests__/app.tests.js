@@ -1149,4 +1149,40 @@ describe("nc news app", () => {
         });
     });
   });
+  describe("POST /api/topics", () => {
+    test("status: 201, responds with the posted topic", () => {
+      return request(app)
+        .post("/api/topics")
+        .send({ slug: "test", description: "test description" })
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.topic).toEqual({
+            slug: "test",
+            description: "test description",
+          });
+        });
+    });
+    test("status: 400, responds with an error message if the request body is missing the slug", () => {
+      return request(app)
+        .post("/api/topics")
+        .send({ description: "test description" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Bad Request",
+          });
+        });
+    });
+    test("status: 400, responds with an error message if the request body is missing the description", () => {
+      return request(app)
+        .post("/api/topics")
+        .send({ slug: "test" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            msg: "Bad Request",
+          });
+        });
+    });
+  });
 });
