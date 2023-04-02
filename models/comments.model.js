@@ -1,6 +1,6 @@
 const db = require("../db/connection");
 
-exports.fetchCommentsByArticleId = (article_id) => {
+exports.fetchCommentsByArticleId = (article_id, startIndex, endIndex) => {
   return db
     .query(
       `
@@ -12,7 +12,9 @@ exports.fetchCommentsByArticleId = (article_id) => {
       [article_id]
     )
     .then((result) => {
-      return result.rows;
+      const total_count = result.rowCount;
+      const comments = result.rows.slice(startIndex, endIndex);
+      return [comments, total_count];
     });
 };
 

@@ -41,7 +41,7 @@ exports.fetchArticle = (
       return articleNotFoundMsg();
     }
 
-    const total_count = result.rows.length;
+    const total_count = result.rowCount;
     const articles = result.rows.slice(startIndex, endIndex);
     return [articles, total_count];
   });
