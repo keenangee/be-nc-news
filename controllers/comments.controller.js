@@ -6,17 +6,54 @@ const {
   updateCommentById,
 } = require("../models/comments.model");
 const { fetchArticleById } = require("../models/articles.model");
+const {
+  checkLimitandP,
+  calculateStartindexAndEndindex,
+} = require("../utils/utils");
 
 exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
-  Promise.all([
-    fetchCommentsByArticleId(article_id),
-    fetchArticleById(article_id),
-  ])
-    .then(([comments, article]) => {
-      res.status(200).send({ comments });
+  const { limit, p } = req.query;
+
+  const { startIndex, endIndex } = calculateStartindexAndEndindex(limit, p);
+
+  const promiseArray = [];
+
+  if (limit || p) {
+    promiseArray.push(checkLimitandP(limit, p));
+  }
+
+  promiseArray.push(fetchArticleById(article_id));
+
+  Promise.all(promiseArray)
+    .then((result) => {
+      if (result.includes(false)) {
+        return Promise.reject({ status: 400, msg: "Invalid sort query" });
+      }
+    })
+    .then(() => {
+      fetchCommentsByArticleId(article_id, startIndex, endIndex)
+        .then(([comments, total_count]) => {
+          if (startIndex > total_count) {
+            return Promise.reject({
+              status: 404,
+              msg: `Page ${p} does not exist`,
+            });
+          }
+          res.status(200).send({ comments, total_count });
+        })
+        .catch((err) => next(err));
     })
     .catch((err) => next(err));
+
+  // Promise.all([
+  //   fetchCommentsByArticleId(article_id),
+  //   fetchArticleById(article_id),
+  // ])
+  //   .then(([comments, article]) => {
+  //     res.status(200).send({ comments });
+  //   })
+  //   .catch((err) => next(err));
 };
 
 exports.postCommentByArticleId = (req, res, next) => {
