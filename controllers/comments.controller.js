@@ -45,15 +45,6 @@ exports.getCommentsByArticleId = (req, res, next) => {
         .catch((err) => next(err));
     })
     .catch((err) => next(err));
-
-  // Promise.all([
-  //   fetchCommentsByArticleId(article_id),
-  //   fetchArticleById(article_id),
-  // ])
-  //   .then(([comments, article]) => {
-  //     res.status(200).send({ comments });
-  //   })
-  //   .catch((err) => next(err));
 };
 
 exports.postCommentByArticleId = (req, res, next) => {
