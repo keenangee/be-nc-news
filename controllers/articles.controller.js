@@ -99,12 +99,4 @@ exports.deleteArticleById = (req, res, next) => {
   }
 
   deleteArticle();
-
-  // fetchArticleById(article_id)
-  //   .then(() => {
-  //     removeArticleById(article_id).then(() => {
-  //       res.sendStatus(204);
-  //     });
-  //   })
-  //   .catch((err) => next(err));
 };
