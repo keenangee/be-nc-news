@@ -1,5 +1,6 @@
 const express = require("express");
 const apiRouter = require("./routes/api-router");
+const cors = require("cors");
 
 const {
   routeNotFoundError,
@@ -10,6 +11,8 @@ const {
 } = require("./controllers/errorHandle.controller");
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
