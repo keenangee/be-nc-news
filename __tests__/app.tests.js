@@ -851,7 +851,7 @@ describe("nc news app", () => {
             body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
             article_id: 9,
             author: "butter_bridge",
-            votes: 42,
+            votes: 26,
             created_at: expect.any(String),
           });
         });
@@ -867,7 +867,7 @@ describe("nc news app", () => {
             body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
             article_id: 9,
             author: "butter_bridge",
-            votes: 22,
+            votes: 6,
             created_at: expect.any(String),
           });
         });

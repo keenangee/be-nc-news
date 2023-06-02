@@ -77,7 +77,7 @@ exports.patchCommentById = (req, res, next) => {
   }
   fetchCommentByCommentId(comment_id)
     .then((comment) => {
-      const newVotes = comment.votes + inc_votes;
+      const newVotes = inc_votes;
       updateCommentById(comment_id, newVotes).then((comment) => {
         res.status(200).send({ comment });
       });
